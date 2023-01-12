@@ -90,26 +90,21 @@ class ViewController: UIViewController {
     
     
     
-    
+    // 2. Observable로 오는 데이터를 받아서 처리하는 방법
     @IBAction func onLoad() {
         editView.text = ""
         self.setVisibleWithAnimation(self.activityIndicator, true)
         
-        let observable = downloadJson(MEMBER_LIST_URL)
-        
-        // 2. Observable로 오는 데이터를 받아서 처리하는 방법
-    
-       let disposable = observable.subscribe(){ [weak self] event in
-            switch event{
-                case .next(let json):
-                    break
-                case .error(let err):
-                    break
-                case .completed:
-                    break
-            }
-        }
-        disposable.dispose()
+        _ = downloadJson(MEMBER_LIST_URL)
+            .map{$0?.count ?? 0}                // operator
+            .filter{$0 > 0}                     // operator
+            .map{"\($0)"}                       // operator
+            .observeOn(MainScheduler.instance)  // DispatchQueue.main.async()를 없애주는 sugar
+            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+            .subscribe(onNext: { [weak self] json in
+                self?.editView.text = json
+                self?.setVisibleWithAnimation(self?.activityIndicator, false)
+            })
     }
 }
 
