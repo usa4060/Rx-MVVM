@@ -12,17 +12,6 @@ import UIKit
 
 let MEMBER_LIST_URL = "https://my.api.mockaroo.com/members_with_avatar.json?key=44ce18f0"
 
-//class Observable<T> {
-//    private let task : (@escaping (T) -> Void)-> Void
-//
-//    init(task: @escaping (@escaping (T) -> Void) -> Void) {
-//        self.task = task
-//    }
-//
-//    func subscribe(_ f : @escaping (T) -> Void){
-//        task(f)
-//    }
-//}
 
 class ViewController: UIViewController {
     @IBOutlet var timerLabel: UILabel!
@@ -46,7 +35,7 @@ class ViewController: UIViewController {
     
     
     // 1. 비동기로 생기는 데이터를 Observable로 감싸서 리턴하는 방법
-    func downloadJson(_ url : String )-> Observable<String?> {
+    func downloadJson(_ url : String )-> Observable<String> {
         
        return Observable.create(){ emit in
            let url = URL(string: MEMBER_LIST_URL)!
@@ -95,12 +84,11 @@ class ViewController: UIViewController {
         editView.text = ""
         self.setVisibleWithAnimation(self.activityIndicator, true)
         
-        _ = downloadJson(MEMBER_LIST_URL)
-            .map{$0?.count ?? 0}                // operator
-            .filter{$0 > 0}                     // operator
-            .map{"\($0)"}                       // operator
-            .observeOn(MainScheduler.instance)  // DispatchQueue.main.async()를 없애주는 sugar
-            .subscribeOn(ConcurrentDispatchQueueScheduler(qos: .default))
+        let jsonObservable = downloadJson(MEMBER_LIST_URL)
+        let helloObservable = Observable.just("Hello World")
+        
+        _ = Observable.zip(jsonObservable, helloObservable) {$1 + "\n" + $0}
+            .observeOn(MainScheduler.instance)
             .subscribe(onNext: { [weak self] json in
                 self?.editView.text = json
                 self?.setVisibleWithAnimation(self?.activityIndicator, false)
