@@ -19,8 +19,10 @@ class MenuViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateUI()
         
+        viewModel.itemsCount
+            .subscribe(onNext: {self.itemCountLabel.text = "\($0)"})
+            .disposed(by: disposeBag)
         viewModel.totalPrice
             .map{$0.currencyKR()}
             .subscribe(onNext: {self.totalPrice.text = $0})
@@ -55,13 +57,6 @@ class MenuViewController: UIViewController {
         // TODO: no selection
         // showAlert("Order Fail", "No Orders")
         // performSegue(withIdentifier: "OrderViewController", sender: nil)
-        
-        
-    }
-     
-    func updateUI(){
-        itemCountLabel.text = "\(viewModel.itemsCount)"
-//        totalPrice.text = viewModel.totalPrice.currencyKR()
         
     }
     
