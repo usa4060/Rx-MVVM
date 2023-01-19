@@ -9,7 +9,7 @@
 import Foundation
 
 
-// ViewModel (실제 View에 표현하기 위한 Moel)
+// ViewModel (실제 View에 표현하기 위한 Model)
 struct Menu {
     var id : Int
     var name : String
