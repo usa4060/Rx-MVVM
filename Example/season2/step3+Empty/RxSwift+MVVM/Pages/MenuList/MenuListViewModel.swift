@@ -25,7 +25,7 @@ import RxCocoa
 
 class MenuListViewModel{
     
-    var menusObservable = BehaviorSubject<[Menu]>(value: [])
+    var menusObservable = BehaviorRelay<[Menu]>(value: [])
     
     
     lazy var itemsCount = menusObservable
@@ -64,13 +64,13 @@ class MenuListViewModel{
             }
             .take(1)
             .subscribe (onNext:{
-                self.menusObservable.onNext($0)
+                self.menusObservable.accept($0)
             })
     }
     
     func onOrdered(){
         menusObservable
-            .onNext([Menu(id: 0, name: "시리", price: 1000, count: Int.random(in: 0...4)),
+            .accept([Menu(id: 0, name: "시리", price: 1000, count: Int.random(in: 0...4)),
                      Menu(id: 1, name: "시리", price: 1000, count: Int.random(in: 0...4)),
                      Menu(id: 2, name: "시리", price: 1000, count: Int.random(in: 0...4))
                     ])
@@ -89,7 +89,7 @@ class MenuListViewModel{
             }
             .take(1)
             .subscribe (onNext:{
-                self.menusObservable.onNext($0)
+                self.menusObservable.accept($0)
             })
         
     }
